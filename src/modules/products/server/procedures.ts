@@ -1,0 +1,114 @@
+import { baseProcedure, createTRPCRouter } from "@/trpc/init";
+import z from "zod";
+import type { Sort, Where } from "payload";
+import { Category, Media } from "../../../../payload-types";
+import { normalizeForDB } from "@/utils/currency";
+import { sortValues } from "../hooks/use-product-filters";
+import { DEFAULT_LIMIT } from "@/constants";
+
+export const productsRouter = createTRPCRouter({
+  getMany: baseProcedure
+    .input(
+      z.object({
+        cursor: z.number().default(1),
+        limit: z.number().default(DEFAULT_LIMIT),
+        category: z.string().nullable().optional(),
+        minPrice: z.string().nullable().optional(),
+        maxPrice: z.string().nullable().optional(),
+        tags: z.array(z.string()).nullable().optional(),
+        sort: z.enum(sortValues).nullable().optional(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const where: Where = {};
+      let sort: Sort = "-createdAt";
+      const minPrice = input.minPrice ? normalizeForDB(input.minPrice) : "";
+      const maxPrice = input.maxPrice ? normalizeForDB(input.maxPrice) : "";
+      const tags = input.tags;
+
+      if (input.sort === "curated") {
+        sort = "-createdAt";
+      }
+
+      if (input.sort === "hot_and_new") {
+        sort = "+createdAt";
+      }
+
+      if (input.sort === "trending") {
+        sort = "-createdAt";
+      }
+
+      if (minPrice && maxPrice) {
+        where.price = {
+          less_than_equal: maxPrice,
+          greater_than_equal: minPrice,
+        };
+      } else if (minPrice) {
+        where.price = {
+          greater_than_equal: minPrice,
+        };
+      } else if (maxPrice) {
+        where.price = {
+          less_than_equal: maxPrice,
+        };
+      }
+
+      if (tags && tags.length > 0) {
+        where["tags.name"] = {
+          in: tags,
+        };
+      }
+
+      if (input.category) {
+        const categoriesData = await ctx.db.find({
+          collection: "categories",
+          limit: 1,
+          pagination: false,
+          where: {
+            slug: {
+              equals: input.category,
+            },
+          },
+        });
+
+        const formattedData = categoriesData.docs.map((doc) => ({
+          ...doc,
+          subcategories: (doc.subcategories?.docs ?? []).map((doc) => ({
+            // Because of 'depth: 1' we are confident doc will be a type of "Category"
+            ...(doc as Category),
+            subcategories: undefined,
+          })),
+        }));
+
+        const subcategories = [];
+        const parentCategory = formattedData[0];
+
+        if (parentCategory)
+          subcategories.push(
+            ...parentCategory.subcategories?.map(
+              (subcategory) => subcategory.slug
+            )
+          );
+        where["category.slug"] = {
+          in: [parentCategory?.slug, ...subcategories],
+        };
+      }
+
+      const data = await ctx.db.find({
+        collection: "products",
+        depth: 1, // Populate "category" & "image" & "RefundPolicy"
+        where, 
+        sort,
+        page:input.cursor,
+        limit: input.limit
+      });
+
+      return {
+        ...data,
+        docs:data.docs.map((doc) => ({
+          ...doc,
+          image: doc.image as Media | null
+        }))
+      };
+    }),
+});
