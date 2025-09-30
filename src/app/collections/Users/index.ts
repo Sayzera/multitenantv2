@@ -1,8 +1,8 @@
-import type { CollectionConfig } from 'payload'
 import { tenantsArrayField } from '@payloadcms/plugin-multi-tenant/fields'
-import { externalUsersLogin } from './externalUsersLogin'
-import { setCookieBasedOnDomain } from '../hooks/setCookieBasedOnDomain'
-import { ensureUniqueUsername } from '../hooks/ensureUniqueUsername'
+import type { CollectionConfig } from 'payload'
+import { externalUsersLogin } from './endpoints/externalUsersLogin'
+import { ensureUniqueUsername } from './hooks/ensureUniqueUsername'
+import { setCookieBasedOnDomain } from './hooks/setCookieBasedOnDomain'
 
 const defaultTenantArrayField = tenantsArrayField({
   tenantsArrayFieldName: 'tenants',

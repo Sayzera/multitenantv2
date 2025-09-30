@@ -1,20 +1,20 @@
 import { multiTenantPlugin } from '@payloadcms/plugin-multi-tenant'
 
-import sharp from 'sharp'
-import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { mongooseAdapter } from '@payloadcms/db-mongodb'
-import { buildConfig } from 'payload'
-import { tr } from '@payloadcms/translations/languages/tr'
-import { en } from '@payloadcms/translations/languages/en'
+import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { de } from '@payloadcms/translations/languages/de'
-import { Posts } from './collections/posts'
+import { en } from '@payloadcms/translations/languages/en'
+import { tr } from '@payloadcms/translations/languages/tr'
+import { buildConfig } from 'payload'
+import sharp from 'sharp'
 import { Categories } from './collections/Categories'
-import { Users } from './collections/Users/endpoints'
 import { Media } from './collections/Media'
-import { RefundPolicy } from './collections/RefundPolicy'
+import { Posts } from './collections/posts'
 import { Products } from './collections/Products'
+import { RefundPolicy } from './collections/RefundPolicy'
 import { Tags } from './collections/Tags'
 import { Tenants } from './collections/Tenants'
+import { Users } from './collections/Users'
 
 export default buildConfig({
   // If you'd like to use Rich Text, pass your editor here
@@ -43,7 +43,19 @@ export default buildConfig({
   plugins: [
     multiTenantPlugin({
       collections: {
-        products: {},
+        products: {
+          tenantFieldOverrides: {
+            defaultValue: ({ req }) => {
+              // Giriş yapmış bir kullanıcı varsa ve tenant'ları varsa
+              if (req.user && req.user.tenants && req.user.tenants.length > 0) {
+                // Kullanıcının tenants dizisindeki ilk tenant'ın ID'sini döndür
+                return req.user.tenants[0].tenant
+              }
+              // Koşul sağlanmıyorsa alanı boş bırak
+              return undefined
+            },
+          },
+        },
       },
       tenantsArrayField: {
         includeDefaultField: false,
