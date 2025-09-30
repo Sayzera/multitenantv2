@@ -1,21 +1,26 @@
 import 'server-only'
-import { cookies as getCookies } from "next/headers";
+import { cookies as getCookies } from 'next/headers'
+import { revalidatePath } from 'next/cache'
 
 interface Props {
-  prefix: string;
-  value: string;
+  prefix: string
+  value: string
 }
 
 export const generateAuthCookie = async ({ prefix, value }: Props) => {
-  const cookies = await getCookies();
+  const cookies = await getCookies()
 
   cookies.set({
     name: `${prefix}-token`,
     value: value,
     httpOnly: true,
-    path: "/",
+    path: '/',
     // TODO: Ensure cross-domain cookie sharing
     // sameSite: "none"
     // domain: ""
-  });
-};
+  })
+}
+
+export const clearAllCache = async () => {
+  revalidatePath('/')
+}

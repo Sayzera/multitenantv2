@@ -1,92 +1,82 @@
-"use client";
+'use client'
 
-import React, { useState } from "react";
-import { Poppins } from "next/font/google";
-import Link from "next/link";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { usePathname } from "next/navigation";
-import { NavbarSidebar } from "./navbar-sidebar";
-import { MenuIcon } from "lucide-react";
-import { useTRPC } from "@/trpc/client";
-import { useQuery } from "@tanstack/react-query";
+import React, { useState } from 'react'
+import { Poppins } from 'next/font/google'
+import Link from 'next/link'
+import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import { usePathname } from 'next/navigation'
+import { NavbarSidebar } from './navbar-sidebar'
+import { MenuIcon } from 'lucide-react'
+import { useTRPC } from '@/trpc/client'
+import { useQuery } from '@tanstack/react-query'
 const poppings = Poppins({
-  subsets: ["latin"],
-  weight: ["700"],
-});
-type Props = {};
+  subsets: ['latin'],
+  weight: ['700'],
+})
+type Props = {}
 
 interface NavbarItemsProps {
-  children: React.ReactNode;
-  isActive?: boolean;
-  href: string;
+  children: React.ReactNode
+  isActive?: boolean
+  href: string
 }
 
 const NavbarItem = ({ href, children, isActive }: NavbarItemsProps) => {
   return (
     <Button
       asChild
-      variant={"outline"}
+      variant={'outline'}
       className={cn(
-        "bg-transparent hover:bg-transparent rounded-full hover:border-primary border-transparent px-3.5 text-lg",
-        isActive && "bg-black text-white hover:bg-black hover:text-white"
+        'bg-transparent hover:bg-transparent rounded-full hover:border-primary border-transparent px-3.5 text-lg',
+        isActive && 'bg-black text-white hover:bg-black hover:text-white',
       )}
     >
       <Link href={href}>{children}</Link>
     </Button>
-  );
-};
+  )
+}
 
 const navbarItems: NavbarItemsProps[] = [
   {
-    href: "/",
-    children: "Home",
+    href: '/',
+    children: 'Home',
   },
   {
-    href: "/about",
-    children: "About",
+    href: '/about',
+    children: 'About',
   },
   {
-    href: "/features",
-    children: "Features",
+    href: '/features',
+    children: 'Features',
   },
   {
-    href: "/pricing",
-    children: "Pricing",
+    href: '/pricing',
+    children: 'Pricing',
   },
   {
-    href: "/contact",
-    children: "Contact",
+    href: '/contact',
+    children: 'Contact',
   },
-];
+]
 
 function Navbar() {
-  const pathname = usePathname();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const pathname = usePathname()
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
-  const trpc = useTRPC();
-  const session = useQuery(trpc.auth.session.queryOptions());
+  const trpc = useTRPC()
+  const session = useQuery(trpc.auth.session.queryOptions())
 
   return (
     <nav className="h-20 flex border-b justify-between font-medium bg-white">
-      <Link href={"/"} className="flex pl-6 items-center  ">
-        <span className={cn("text-5xl font-semibold", poppings.className)}>
-          Funroad
-        </span>
+      <Link href={'/'} className="flex pl-6 items-center  ">
+        <span className={cn('text-5xl font-semibold', poppings.className)}>Funroad</span>
       </Link>
 
-      <NavbarSidebar
-        items={navbarItems}
-        onOpenChange={setIsSidebarOpen}
-        open={isSidebarOpen}
-      />
+      <NavbarSidebar items={navbarItems} onOpenChange={setIsSidebarOpen} open={isSidebarOpen} />
       <div className="items-center gap-4 hidden lg:flex">
         {navbarItems.map((item) => (
-          <NavbarItem
-            key={item.href}
-            {...item}
-            isActive={pathname === item.href}
-          />
+          <NavbarItem key={item.href} {...item} isActive={pathname === item.href} />
         ))}
       </div>
 
@@ -94,11 +84,11 @@ function Navbar() {
         <div className="hidden lg:flex">
           <Button
             asChild
-            variant={"secondary"}
+            variant={'secondary'}
             className="border-l border-t-0 
           border-b-0 border-r-0 px-12 h-full rounded-none bg-white hover:bg-pink-400 transition-colors text-lg"
           >
-            <Link prefetch href={"/admin"}>
+            <Link prefetch href={'/admin'}>
               Dashboard
             </Link>
           </Button>
@@ -107,22 +97,22 @@ function Navbar() {
         <div className="hidden lg:flex">
           <Button
             asChild
-            variant={"secondary"}
+            variant={'secondary'}
             className="border-l border-t-0 
           border-b-0 border-r-0 px-12 h-full rounded-none bg-white hover:bg-pink-400 transition-colors text-lg"
           >
-            <Link prefetch href={"/sign-in"}>
+            <Link prefetch href={'/sign-in'}>
               Log in
             </Link>
           </Button>
 
           <Button
             asChild
-            variant={"secondary"}
+            variant={'secondary'}
             className="border-l border-t-0 
           border-b-0 border-r-0 px-12 h-full rounded-none bg-black hover:bg-pink-400 transition-colors text-lg text-white hover:text-black"
           >
-            <Link prefetch href={"/sign-up"}>
+            <Link prefetch href={'/sign-up'}>
               Start selling
             </Link>
           </Button>
@@ -131,17 +121,17 @@ function Navbar() {
 
       <div className="flex lg:hidden items-center justify-center">
         <Button
-          variant={"ghost"}
+          variant={'ghost'}
           className="size-12 border-transparent bg-white"
           onClick={() => {
-            setIsSidebarOpen(true);
+            setIsSidebarOpen(true)
           }}
         >
           <MenuIcon />
         </Button>
       </div>
     </nav>
-  );
+  )
 }
 
-export default Navbar;
+export default Navbar

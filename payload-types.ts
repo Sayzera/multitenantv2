@@ -163,7 +163,7 @@ export interface Category {
  */
 export interface User {
   id: string;
-  username: string;
+  username?: string | null;
   /**
    * Roles of the user
    */
@@ -171,6 +171,7 @@ export interface User {
   tenants?:
     | {
         tenant: string | Tenant;
+        roles: ('super-admin' | 'user')[];
         id?: string | null;
       }[]
     | null;
@@ -389,6 +390,7 @@ export interface UsersSelect<T extends boolean = true> {
     | T
     | {
         tenant?: T;
+        roles?: T;
         id?: T;
       };
   updatedAt?: T;

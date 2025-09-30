@@ -1,10 +1,13 @@
 import type { CollectionConfig } from 'payload'
 import { tenantsArrayField } from '@payloadcms/plugin-multi-tenant/fields'
+import { externalUsersLogin } from './externalUsersLogin'
+import { setCookieBasedOnDomain } from '../hooks/setCookieBasedOnDomain'
+import { ensureUniqueUsername } from '../hooks/ensureUniqueUsername'
 
 const defaultTenantArrayField = tenantsArrayField({
   tenantsArrayFieldName: 'tenants',
-  tenantsCollectionSlug: 'tenants',
   tenantsArrayTenantFieldName: 'tenant',
+  tenantsCollectionSlug: 'tenants',
   arrayFieldAccess: {
     read: () => true,
     create: () => true,
@@ -15,6 +18,21 @@ const defaultTenantArrayField = tenantsArrayField({
     create: () => true,
     update: () => true,
   },
+  rowFields: [
+    {
+      name: 'roles',
+      type: 'select',
+      defaultValue: ['user'],
+      hasMany: true,
+      options: ['super-admin', 'user'],
+      required: true,
+      access: {
+        update: ({ req }) => {
+          return true
+        },
+      },
+    },
+  ],
 })
 
 export const Users: CollectionConfig = {
@@ -22,15 +40,21 @@ export const Users: CollectionConfig = {
   admin: {
     useAsTitle: 'username',
   },
-
+  hooks: {
+    afterLogin: [setCookieBasedOnDomain],
+  },
+  endpoints: [externalUsersLogin],
   auth: true,
   fields: [
     {
       name: 'username',
-      required: true,
-      unique: true,
       type: 'text',
+      hooks: {
+        beforeValidate: [ensureUniqueUsername],
+      },
+      index: true,
     },
+
     {
       name: 'email',
       required: true,

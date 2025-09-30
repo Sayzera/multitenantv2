@@ -5,19 +5,19 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from "@/components/ui/sheet";
-import { ScrollArea } from "@radix-ui/react-scroll-area";
-import Link from "next/link";
+} from '@/components/ui/sheet'
+import { ScrollArea } from '@radix-ui/react-scroll-area'
+import Link from 'next/link'
 
 interface NavbarItem {
-  href: string;
-  children: React.ReactNode;
+  href: string
+  children: React.ReactNode
 }
 
 interface Props {
-  items: NavbarItem[];
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
+  items: NavbarItem[]
+  open: boolean
+  onOpenChange: (open: boolean) => void
 }
 
 export const NavbarSidebar = ({ items, open, onOpenChange }: Props) => {
@@ -36,7 +36,7 @@ export const NavbarSidebar = ({ items, open, onOpenChange }: Props) => {
               href={item.href}
               className="w-full text-left p-4 hover:bg-black hover:text-white flex items-center text-base font-medium"
               onClick={() => {
-                onOpenChange(false);
+                onOpenChange(false)
               }}
             >
               {item.children}
@@ -45,19 +45,19 @@ export const NavbarSidebar = ({ items, open, onOpenChange }: Props) => {
 
           <div className="border-t">
             <Link
-              href={"/sign-in"}
+              href={'/sign-in'}
               className="w-full text-left p-4 hover:bg-black hover:text-white flex items-center text-base font-medium"
               onClick={() => {
-                onOpenChange(false);
+                onOpenChange(false)
               }}
             >
               log in
             </Link>
             <Link
-              href={"/sign-up"}
+              href={'/sign-up'}
               className="w-full text-left p-4 hover:bg-black hover:text-white flex items-center text-base font-medium"
               onClick={() => {
-                onOpenChange(false);
+                onOpenChange(false)
               }}
             >
               Start selling
@@ -66,5 +66,5 @@ export const NavbarSidebar = ({ items, open, onOpenChange }: Props) => {
         </ScrollArea>
       </SheetContent>
     </Sheet>
-  );
-};
+  )
+}

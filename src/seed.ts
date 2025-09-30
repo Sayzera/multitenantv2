@@ -160,7 +160,8 @@ const seed = async () => {
       username: 'admin',
       tenants: [
         {
-          tenant: String(adminTenant.id),
+          tenant: adminTenant.id,
+          roles: ['super-admin'],
         },
       ],
     },

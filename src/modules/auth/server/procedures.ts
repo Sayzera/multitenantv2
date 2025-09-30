@@ -2,7 +2,7 @@ import { headers as getHeaders, cookies as getCookies } from 'next/headers'
 import { baseProcedure, createTRPCRouter } from '@/trpc/init'
 import z from 'zod'
 import { TRPCError } from '@trpc/server'
-import { generateAuthCookie } from '../utils'
+import { clearAllCache, generateAuthCookie } from '../utils'
 
 export const authRouter = createTRPCRouter({
   session: baseProcedure.query(async ({ ctx }) => {
@@ -67,10 +67,13 @@ export const authRouter = createTRPCRouter({
 
       await ctx.db.create({
         collection: 'users',
+
         data: {
+          roles: ['user'],
           tenants: [
             {
               tenant: tenant.id,
+              roles: ['user'],
             },
           ],
           email: input.email,
@@ -98,6 +101,7 @@ export const authRouter = createTRPCRouter({
 
         value: data.token,
       })
+      await clearAllCache()
     }),
   login: baseProcedure
     .input(
@@ -126,7 +130,7 @@ export const authRouter = createTRPCRouter({
         prefix: ctx.db.config.cookiePrefix,
         value: data.token,
       })
-
+      await clearAllCache()
       return data
     }),
 })
