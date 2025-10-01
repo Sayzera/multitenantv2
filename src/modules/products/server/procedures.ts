@@ -1,10 +1,10 @@
-import { baseProcedure, createTRPCRouter } from "@/trpc/init";
-import z from "zod";
-import type { Sort, Where } from "payload";
-import { Category, Media } from "../../../../payload-types";
-import { normalizeForDB } from "@/utils/currency";
-import { sortValues } from "../hooks/use-product-filters";
-import { DEFAULT_LIMIT } from "@/constants";
+import { baseProcedure, createTRPCRouter } from '@/trpc/init'
+import z from 'zod'
+import type { Sort, Where } from 'payload'
+import { Category, Media, Tenant } from '../../../../payload-types'
+import { normalizeForDB } from '@/utils/currency'
+import { sortValues } from '../hooks/use-product-filters'
+import { DEFAULT_LIMIT } from '@/constants'
 
 export const productsRouter = createTRPCRouter({
   getMany: baseProcedure
@@ -17,51 +17,58 @@ export const productsRouter = createTRPCRouter({
         maxPrice: z.string().nullable().optional(),
         tags: z.array(z.string()).nullable().optional(),
         sort: z.enum(sortValues).nullable().optional(),
-      })
+        tenantSlug: z.string().nullable().optional(),
+      }),
     )
     .query(async ({ ctx, input }) => {
-      const where: Where = {};
-      let sort: Sort = "-createdAt";
-      const minPrice = input.minPrice ? normalizeForDB(input.minPrice) : "";
-      const maxPrice = input.maxPrice ? normalizeForDB(input.maxPrice) : "";
-      const tags = input.tags;
+      const where: Where = {}
+      let sort: Sort = '-createdAt'
+      const minPrice = input.minPrice ? normalizeForDB(input.minPrice) : ''
+      const maxPrice = input.maxPrice ? normalizeForDB(input.maxPrice) : ''
+      const tags = input.tags
 
-      if (input.sort === "curated") {
-        sort = "-createdAt";
+      if (input.sort === 'curated') {
+        sort = '-createdAt'
       }
 
-      if (input.sort === "hot_and_new") {
-        sort = "+createdAt";
+      if (input.tenantSlug) {
+        where['tenant.slug'] = {
+          equals: input.tenantSlug,
+        }
       }
 
-      if (input.sort === "trending") {
-        sort = "-createdAt";
+      if (input.sort === 'hot_and_new') {
+        sort = '+createdAt'
+      }
+
+      if (input.sort === 'trending') {
+        sort = '-createdAt'
       }
 
       if (minPrice && maxPrice) {
         where.price = {
           less_than_equal: maxPrice,
           greater_than_equal: minPrice,
-        };
+        }
       } else if (minPrice) {
         where.price = {
           greater_than_equal: minPrice,
-        };
+        }
       } else if (maxPrice) {
         where.price = {
           less_than_equal: maxPrice,
-        };
+        }
       }
 
       if (tags && tags.length > 0) {
-        where["tags.name"] = {
+        where['tags.name'] = {
           in: tags,
-        };
+        }
       }
 
       if (input.category) {
         const categoriesData = await ctx.db.find({
-          collection: "categories",
+          collection: 'categories',
           limit: 1,
           pagination: false,
           where: {
@@ -69,7 +76,7 @@ export const productsRouter = createTRPCRouter({
               equals: input.category,
             },
           },
-        });
+        })
 
         const formattedData = categoriesData.docs.map((doc) => ({
           ...doc,
@@ -78,37 +85,39 @@ export const productsRouter = createTRPCRouter({
             ...(doc as Category),
             subcategories: undefined,
           })),
-        }));
+        }))
 
-        const subcategories = [];
-        const parentCategory = formattedData[0];
+        const subcategories = []
+        const parentCategory = formattedData[0]
 
         if (parentCategory)
           subcategories.push(
-            ...parentCategory.subcategories?.map(
-              (subcategory) => subcategory.slug
-            )
-          );
-        where["category.slug"] = {
+            ...parentCategory.subcategories?.map((subcategory) => subcategory.slug),
+          )
+        where['category.slug'] = {
           in: [parentCategory?.slug, ...subcategories],
-        };
+        }
       }
 
       const data = await ctx.db.find({
-        collection: "products",
-        depth: 1, // Populate "category" & "image" & "RefundPolicy"
-        where, 
+        collection: 'products',
+        depth: 2, // Populate "category" & "image" & "RefundPolicy" & Tenant
+        where,
         sort,
-        page:input.cursor,
-        limit: input.limit
-      });
+        page: input.cursor,
+        limit: input.limit,
+      })
 
+      // console.log(JSON.stringify(data, null, 2))
       return {
         ...data,
-        docs:data.docs.map((doc) => ({
+        docs: data.docs.map((doc) => ({
           ...doc,
-          image: doc.image as Media | null
-        }))
-      };
+          image: doc.image as Media | null,
+          tenant: doc.tenant as Tenant & {
+            image: Media | null
+          },
+        })),
+      }
     }),
-});
+})

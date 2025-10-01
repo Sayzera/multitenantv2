@@ -1,28 +1,23 @@
-import {
-  createLoader,
-  parseAsString,
-  parseAsArrayOf,
-  parseAsStringLiteral,
-} from "nuqs/server";
-import { sortValues } from "./hooks/use-product-filters";
+import { createLoader, parseAsString, parseAsArrayOf, parseAsStringLiteral } from 'nuqs/server'
+import { sortValues } from './hooks/use-product-filters'
 
 export const params = {
-  sort: parseAsStringLiteral(sortValues).withDefault("curated"), // sadece bizim verdiğimiz listeyi kabul eder
+  sort: parseAsStringLiteral(sortValues).withDefault('curated'), // sadece bizim verdiğimiz listeyi kabul eder
   minPrice: parseAsString
     .withOptions({
       clearOnDefault: true,
     })
-    .withDefault(""),
+    .withDefault(''),
   maxPrice: parseAsString
     .withOptions({
       clearOnDefault: true,
     })
-    .withDefault(""),
+    .withDefault(''),
   tags: parseAsArrayOf(parseAsString)
     .withOptions({
       clearOnDefault: true,
     })
     .withDefault([]),
-};
+}
 
-export const loadProductFilters = createLoader(params);
+export const loadProductFilters = createLoader(params)
