@@ -1,25 +1,33 @@
-'use client'
+import type { SearchParams } from 'nuqs/server'
 
-import { useTRPC } from '@/trpc/client'
-import { useQuery } from '@tanstack/react-query'
+import { getQueryClient, trpc } from '@/trpc/server'
+import { loadProductFilters } from '@/modules/products/searchParams'
+import { ProductListView } from '@/modules/products/view/product-list-view'
+import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
+import { DEFAULT_LIMIT } from '@/constants'
 
-const Home = () => {
-  const trpc = useTRPC()
-  const { data } = useQuery(trpc.auth.session.queryOptions())
+interface Props {
+  searchParams: Promise<SearchParams>
+}
+const Page = async ({ searchParams }: Props) => {
+  const filters = await loadProductFilters(searchParams)
+
+  // Veriyi önceden çağırır ve cachler
+  const queryClient = getQueryClient()
+  void queryClient.prefetchInfiniteQuery(
+    trpc.products.getMany.infiniteQueryOptions({
+      ...filters,
+      limit: DEFAULT_LIMIT,
+    }),
+  )
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold text-blue-600 mb-4">Welcome to Home</h1>
-      <p className="text-lg text-gray-700 mb-6">This is a test to see if Tailwind CSS is working.</p>
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-3">Test Card</h2>
-        <p className="text-gray-600">If you can see this styled properly, Tailwind CSS is working!</p>
-        <button className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-          Test Button
-        </button>
-      </div>
-    </div>
+    <>
+      <HydrationBoundary state={dehydrate(queryClient)}>
+        <ProductListView />
+      </HydrationBoundary>
+    </>
   )
 }
 
-export default Home
+export default Page
