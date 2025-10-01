@@ -1,14 +1,11 @@
 'use client'
-import { ProductFilters } from "../ui/components/product-filters";
-import { ProductSort } from "../ui/components/product-sort";
-import { Suspense } from "react";
-import {
-  ProductList,
-  ProductListSkeleton,
-} from "../ui/components/product-list";
+import { ProductFilters } from '../ui/components/product-filters'
+import { ProductSort } from '../ui/components/product-sort'
+import { Suspense } from 'react'
+import { ProductList, ProductListSkeleton } from '../ui/components/product-list'
 
 interface Props {
-  category: string;
+  category?: string
 }
 export const ProductListView = ({ category }: Props) => {
   return (
@@ -29,5 +26,5 @@ export const ProductListView = ({ category }: Props) => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
