@@ -5,7 +5,7 @@ import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { de } from '@payloadcms/translations/languages/de'
 import { en } from '@payloadcms/translations/languages/en'
 import { tr } from '@payloadcms/translations/languages/tr'
-import { buildConfig } from 'payload'
+import { buildConfig, Config } from 'payload'
 import sharp from 'sharp'
 import { Categories } from './collections/Categories'
 import { Media } from './collections/Media'
@@ -41,7 +41,7 @@ export default buildConfig({
   // you don't need it!
   sharp,
   plugins: [
-    multiTenantPlugin({
+    multiTenantPlugin<Config>({
       collections: {
         products: {
           tenantFieldOverrides: {
