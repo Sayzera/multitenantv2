@@ -8,8 +8,8 @@ interface ProductCardProps {
   id: string
   name: string
   imageUrl?: string | null
-  authorUsername: string
-  authorImageUrl?: string | null
+  tenantSlug: string
+  tenantImageUrl?: string | null
   reviewRating: number
   reviewCount: number
   price: number
@@ -19,8 +19,8 @@ export const ProductCard = ({
   id,
   name,
   imageUrl,
-  authorUsername,
-  authorImageUrl,
+  tenantSlug,
+  tenantImageUrl,
   reviewRating,
   reviewCount,
   price,
@@ -30,7 +30,7 @@ export const ProductCard = ({
     e.preventDefault()
     e.stopPropagation()
 
-    router.push(generateTenantURL(authorUsername))
+    router.push(generateTenantURL(tenantSlug))
   }
   return (
     <Link href={`/products/${id}`}>
@@ -47,16 +47,16 @@ export const ProductCard = ({
           <h2 className="text-lg font-medium line-clamp-4">{name}</h2>
           {/* TODO: Redirect to user shop */}
           <div className="flex items-center gap-2" onClick={handleUserClick}>
-            {authorImageUrl && (
+            {tenantImageUrl && (
               <Image
-                alt={authorUsername}
-                src={authorImageUrl}
+                alt={tenantSlug}
+                src={tenantImageUrl}
                 width={16}
                 height={16}
                 className="rounded-full border shrink-0 size-[16px]"
               />
             )}
-            <p className="text-sm underline font-medium">{authorUsername}</p>
+            <p className="text-sm underline font-medium">{tenantSlug}</p>
           </div>
           {reviewCount > 0 && (
             <div className="flex items-center gap-1">
@@ -85,5 +85,34 @@ export const ProductCard = ({
 }
 
 export const ProductCardSkeleton = () => {
-  return <div className="w-full aspect-3/4 bg-neutral-200 rounded-lg animate-pulse"></div>
+  return (
+    <div
+      className={
+        ' transition-shadow border rounded-md bg-white overflow-hidden h-full flex flex-col animate-pulse'
+      }
+      aria-hidden
+    >
+      {/* Image placeholder */}
+      <div className="relative aspect-square bg-neutral-200" />
+
+      {/* Content */}
+      <div className="p-4 border-y flex flex-col gap-3 flex-1">
+        <div className="h-5 bg-neutral-200 rounded w-3/4" />
+
+        <div className="flex items-center gap-2">
+          <div className="w-4 h-4 rounded-full bg-neutral-200 shrink-0" />
+          <div className="h-4 bg-neutral-200 rounded w-1/3" />
+        </div>
+
+        <div className="h-4 bg-neutral-200 rounded w-1/2" />
+      </div>
+
+      {/* Price placeholder */}
+      <div className="p-4">
+        <div className="relative px-2 py-1 border bg-neutral-200 w-fit">
+          <span className="text-sm font-medium text-transparent">price</span>
+        </div>
+      </div>
+    </div>
+  )
 }
