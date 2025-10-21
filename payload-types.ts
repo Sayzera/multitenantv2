@@ -261,6 +261,7 @@ export interface Product {
   category?: (string | null) | Category;
   tags?: (string | null) | Tag;
   image?: (string | null) | Media;
+  cover?: (string | null) | Media;
   refundPolicy?: (string | null) | RefundPolicy;
   updatedAt: string;
   createdAt: string;
@@ -449,6 +450,7 @@ export interface ProductsSelect<T extends boolean = true> {
   category?: T;
   tags?: T;
   image?: T;
+  cover?: T;
   refundPolicy?: T;
   updatedAt?: T;
   createdAt?: T;

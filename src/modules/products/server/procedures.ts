@@ -1,7 +1,7 @@
 import { baseProcedure, createTRPCRouter } from '@/trpc/init'
 import z from 'zod'
 import type { Sort, Where } from 'payload'
-import { Category, Media, Tenant } from '../../../../payload-types'
+import { Category, Media, RefundPolicy, Tenant } from '../../../../payload-types'
 import { normalizeForDB } from '@/utils/currency'
 import { sortValues } from '../hooks/use-product-filters'
 import { DEFAULT_LIMIT } from '@/constants'
@@ -23,6 +23,10 @@ export const productsRouter = createTRPCRouter({
       return {
         ...product,
         image: product.image as Media,
+        tenant: product.tenant as Tenant & {
+          image: Media | null
+        },
+        refundPolicy: product.refundPolicy as RefundPolicy,
       }
     }),
 

@@ -8,32 +8,32 @@ import { DEFAULT_LIMIT } from '@/constants'
 
 interface Props {
   params: Promise<{
-    category: string
-    subcategory: string
+    slug: string
   }>
   searchParams: Promise<SearchParams>
 }
 const Page = async ({ params, searchParams }: Props) => {
-  const { subcategory } = await params
-
+  const { slug } = await params
   const filters = await loadProductFilters(searchParams)
+
+  console.log(searchParams, 'qweqw')
 
   // Veriyi önceden çağırır ve cachler
   const queryClient = getQueryClient()
   void queryClient.prefetchInfiniteQuery(
     trpc.products.getMany.infiniteQueryOptions({
       ...filters,
-      category: subcategory,
+      tenantSlug: slug,
       limit: DEFAULT_LIMIT,
     }),
   )
 
   return (
-    <div>
+    <>
       <HydrationBoundary state={dehydrate(queryClient)}>
-        <ProductListView category={subcategory} />
+        <ProductListView />
       </HydrationBoundary>
-    </div>
+    </>
   )
 }
 
