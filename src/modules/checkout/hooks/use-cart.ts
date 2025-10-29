@@ -1,3 +1,4 @@
+'use client'
 import { useCartStore } from '../store/use-cart-store'
 
 export const useCart = (tenantSlug: string) => {
@@ -5,13 +6,11 @@ export const useCart = (tenantSlug: string) => {
 
   const productIds = getCartByTenant(tenantSlug)
 
-  const addToCart = (productId: string) => {
-    const toggleProduct = (productId: string) => {
-      if (productIds.includes(productId)) {
-        removeProduct(tenantSlug, productId)
-      } else {
-        addProduct(tenantSlug, productId)
-      }
+  const toggleProduct = (productId: string) => {
+    if (productIds.includes(productId)) {
+      removeProduct(tenantSlug, productId)
+    } else {
+      addProduct(tenantSlug, productId)
     }
   }
 
@@ -25,5 +24,12 @@ export const useCart = (tenantSlug: string) => {
 
   return {
     productIds,
+    addProduct: (productId: string) => addProduct(tenantSlug, productId),
+    removeProduct: (productId: string) => removeProduct(tenantSlug, productId),
+    clearCart: clearTenantCart,
+    clearAllCarts,
+    isProductInCart,
+    totalItems: productIds.length,
+    toggleProduct,
   }
 }
