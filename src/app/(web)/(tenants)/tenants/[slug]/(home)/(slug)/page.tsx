@@ -16,8 +16,6 @@ const Page = async ({ params, searchParams }: Props) => {
   const { slug } = await params
   const filters = await loadProductFilters(searchParams)
 
-  console.log(searchParams, 'qweqw')
-
   // Veriyi önceden çağırır ve cachler
   const queryClient = getQueryClient()
   void queryClient.prefetchInfiniteQuery(
