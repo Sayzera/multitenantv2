@@ -98,6 +98,7 @@
     "server-only": "^0.0.1",
     "sharp": "^0.34.2",
     "sonner": "^2.0.5",
+    "stripe": "^19.3.0",
     "superjson": "^2.2.2",
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",

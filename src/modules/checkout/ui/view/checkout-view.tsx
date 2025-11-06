@@ -3,25 +3,56 @@
 import { generateTenantURL } from '@/lib/utils'
 import { useCart } from '@/modules/checkout/hooks/use-cart'
 import { useTRPC } from '@/trpc/client'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
 import { CheckoutItem } from '../components/checkout-item'
 import { CheckoutSidebar } from '../components/checkout-siderbar'
 import { InboxIcon, LoaderIcon } from 'lucide-react'
+import { useCheckoutStates } from '../../hooks/use-checkout-states'
+import { useRouter } from 'next/navigation'
 
 interface CheckoutViewProps {
   tenantSlug: string
 }
 
 function CheckoutView({ tenantSlug }: CheckoutViewProps) {
+  const [states, setStates] = useCheckoutStates()
+  const router = useRouter()
   const trpc = useTRPC()
-  const { productIds, clearAllCarts, removeProduct } = useCart(tenantSlug)
+  const { productIds, clearAllCarts, removeProduct, clearCart } = useCart(tenantSlug)
   const { data, error, isLoading } = useQuery(
     trpc.checkout.getProducts.queryOptions({
       ids: productIds,
     }),
   )
+
+  const purchase = useMutation(
+    trpc.checkout.purchase.mutationOptions({
+      onMutate: () => {
+        setStates({ success: false, cancel: false })
+      },
+      onSuccess: (data) => {
+        window.location.href = data.url
+      },
+      onError: (error) => {
+        if (error.data?.code === 'UNAUTHORIZED') {
+          // TODO: Modify when subdomains enabled
+          router.push('/sign-in')
+        }
+
+        toast.error(error.message)
+      },
+    }),
+  )
+
+  useEffect(() => {
+    if (states.success) {
+      clearCart(tenantSlug)
+      setStates({ success: false, cancel: false })
+      router.push('/products')
+    }
+  }, [states.success, router, setStates, tenantSlug, clearCart])
 
   useEffect(() => {
     if (error?.data?.code === 'NOT_FOUND') {
@@ -74,9 +105,14 @@ function CheckoutView({ tenantSlug }: CheckoutViewProps) {
         <div className="lg:col-span-3">
           <CheckoutSidebar
             total={data?.totalPrice || 0}
-            onCheckout={() => {}}
-            isCanceled={true}
-            isPending={false}
+            onCheckout={() => {
+              purchase.mutate({
+                tenantSlug,
+                productIds,
+              })
+            }}
+            isCanceled={purchase.isError}
+            disabled={purchase.isPending}
           />
         </div>
       </div>

@@ -15,6 +15,7 @@ import { RefundPolicy } from './collections/RefundPolicy'
 import { Tags } from './collections/Tags'
 import { Tenants } from './collections/Tenants'
 import { Users } from './collections/Users'
+import { Orders } from './collections/Orders'
 
 export default buildConfig({
   // If you'd like to use Rich Text, pass your editor here
@@ -26,7 +27,7 @@ export default buildConfig({
   cookiePrefix: 'funroad',
 
   // Define and configure your collections in this array
-  collections: [Posts, Categories, Users, Media, RefundPolicy, Products, Tags, Tenants],
+  collections: [Posts, Categories, Users, Media, RefundPolicy, Products, Tags, Tenants, Orders],
 
   // Your Payload secret - should be a complex and secure string, unguessable
   secret: process.env.PAYLOAD_SECRET || '',

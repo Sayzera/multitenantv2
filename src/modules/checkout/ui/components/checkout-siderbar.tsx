@@ -4,7 +4,7 @@ import { CircleXIcon } from 'lucide-react'
 
 type StatusProps = {
   isCanceled: boolean
-  isPending: boolean
+  disabled: boolean
 }
 
 interface CheckoutSidebarProps extends Partial<StatusProps> {
@@ -16,7 +16,7 @@ export const CheckoutSidebar = ({
   total,
   onCheckout,
   isCanceled,
-  isPending,
+  disabled,
 }: CheckoutSidebarProps) => {
   return (
     <div className="border rounded-md overflow-hidden bg-white flex flex-col">
@@ -28,7 +28,7 @@ export const CheckoutSidebar = ({
       <div className="p-4 flex items-center justify-center">
         <Button
           variant={'elevated'}
-          disabled={isPending}
+          disabled={disabled}
           onClick={onCheckout}
           size={'lg'}
           className="text-base w-full text-white bg-primary hover:bg-pink-400 hover:text-primary hover"
