@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-
+// --- Product Collection ---
 export const Products: CollectionConfig = {
   slug: 'products',
   admin: {
