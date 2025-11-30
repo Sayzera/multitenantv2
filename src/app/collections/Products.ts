@@ -1,0 +1,56 @@
+import type { CollectionConfig } from 'payload'
+// --- Product Collection ---
+export const Products: CollectionConfig = {
+  slug: 'products',
+  admin: {
+    useAsTitle: 'name',
+  },
+  fields: [
+    {
+      name: 'name',
+      type: 'text',
+      required: true,
+    },
+    {
+      name: 'description',
+      type: 'text',
+    },
+    {
+      name: 'price',
+      type: 'number',
+      required: true,
+      min: 0,
+      admin: {
+        description: 'Price in USD',
+      },
+    },
+    {
+      name: 'category',
+      type: 'relationship',
+      relationTo: 'categories',
+      hasMany: false,
+    },
+    {
+      name: 'tags',
+      type: 'relationship',
+      relationTo: 'tags',
+      hasMany: false,
+    },
+    {
+      name: 'image',
+      type: 'upload',
+      relationTo: 'media',
+    },
+    {
+      name: 'cover',
+      type: 'upload',
+      relationTo: 'media',
+    },
+    {
+      name: 'refundPolicy',
+      type: 'relationship',
+      relationTo: 'refundPolicy',
+      hasMany: false,
+    },
+  ],
+}
